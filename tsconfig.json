@@ -21,6 +21,9 @@
       "@/*": ["./src/*"]
     }
   },
+  "typeroots":["./typings/","./node_modules/@types"],
+  "outDir":"dist",
+  "rootDir": "src", 
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
