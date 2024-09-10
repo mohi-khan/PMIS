@@ -32,7 +32,6 @@ import EquipTaskList from "@/components/data/EquipTaskList";
 import EqupSpare from "@/components/data/EquipSpare";
 import EquipHistory from "@/components/data/EquipHistory";
 import { FueldataType, ExpensedataType, MilagedataType } from "@/lib/zod";
-import { ConsoleLogWriter } from "drizzle-orm";
 import TopDiv from "@/components/data/TopDiv";
 import MonthlyCosts from "@/components/data/BottomDivEquip";
 import EquipmentEdit from "@/components/data/EquipmentEdit";
