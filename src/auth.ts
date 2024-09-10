@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
-const crypto = require('crypto');
+
+const bcrypt = require('bcryptjs');
 import Credentials from 'next-auth/providers/credentials'
 import { ZodError } from "zod"
 import { signInSchema } from "./lib/zod"
@@ -34,16 +35,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                       'Content-Type': 'application/json'
                   }
               });
-             console.log(response.status)
+             
               if (response.ok) {
                 // If the response is successful (status 200), return user data
               const user = await response.json();
-              const hashedpassword=await hashPassword(String(credentials.password))
-               console.log(hashedpassword);
+             // const hashedpassword=await hashPassword(String(credentials.password))
+             const isMatch = await bcrypt.compare(credentials.password, user[0].password);
+              console.log(credentials.password)
+        //       console.log(hashedpassword);
                console.log(user[0].password);
-               const validuser=(hashedpassword === user[0].password)?user[0]:null;
-                console.log(validuser);
-                return validuser;
+          //     const validuser=(hashedpassword === user[0].password)?user[0]:null;
+            //    console.log(validuser);
+             //   return validuser;
+   //          const isMatch = await bcrypt.compare(plainPassword, storedHashedPassword);
+  
+      if (isMatch) {
+          return user[0]
+    // Proceed with login (e.g., generate JWT token or session)
+  } else {
+    console.log('Invalid password!');
+    return null;
+    // Handle invalid login attempt (e.g., return error response)
+  }
             } else {
                 // If the response is not successful, return null
                 return null;
@@ -67,10 +80,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signIn: '/signin', // Custom sign-in page
       }
 })
-const hashPassword = (plainPassword: string): Promise<string> => {
-  const hash = crypto.createHash('sha256');
-  hash.update(plainPassword);
-  return hash.digest('hex');
+const hashPassword = async(plainPassword: string): Promise<string> => {
+  const hash = await bcrypt.hash(plainPassword,12);
+  //hash.update(plainPassword);
+  return hash;
   };
 
 //export { handler as GET, handler as POST,signIn, }
