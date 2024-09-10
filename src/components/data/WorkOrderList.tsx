@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import Pagination from "../tools/pagination";
+
 import {
   WorkOrderType,
   equipmentType,
@@ -18,7 +18,6 @@ import {
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { Button } from "../ui/button";
 import WorkOrderComplete from "./CompleteWorkOrder";
-import equipment from "@/app/equipments/page";
 
 export default function WorkOrderList({
   data,

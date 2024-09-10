@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import Pagination from "../tools/pagination";
+
 import { PartType } from "../../lib/zod";
 import { ResponsiveDialog } from "../dialogui/Dialogui";
 import {
