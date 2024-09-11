@@ -12,7 +12,7 @@ const equipmentListSchema = z.object({
   name: z.string(),
   model:z.string(),
   runninghour: z.number(),
-  milagemeter: z.string(),
+  milagemeter: z.string().nullable(),
 });
 export const equipmentSchema = z.object({
   id: z.number().int(),
@@ -24,7 +24,7 @@ export const equipmentSchema = z.object({
   location:z.string(),
   purchasedate:z.string(),
   runninghour: z.number(),
-  milagemeter: z.string(),
+  milagemeter: z.string().nullable(),
   vendor:z.number(),
 });
 export const woSchema = z.object({
