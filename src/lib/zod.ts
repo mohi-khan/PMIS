@@ -19,13 +19,13 @@ export const equipmentSchema = z.object({
   name: z.string(),
   model:z.string(),
   status:z.string(),
-  manufacturur:z.string(),
+  manufacturur:z.string().nullable(),
   serial:z.string(),
-  location:z.string(),
-  purchasedate:z.string(),
+  location:z.string().nullable(),
+  purchasedate:z.string().nullable(),
   runninghour: z.number(),
   milagemeter: z.string().nullable(),
-  vendor:z.number(),
+  vendor:z.number().nullable(),
 });
 export const woSchema = z.object({
   id: z.number().int(),
