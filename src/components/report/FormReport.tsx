@@ -59,13 +59,13 @@ const FormReport: React.FC = () => {
       selectedEquipment &&
       selectedJob
     ) {
-      window.location.href = `/reports/workorder/${selectedEquipment}/${selectedJob}`;
+      window.location.href = `/others/reports/workorder/${selectedEquipment}/${selectedJob}`;
     } else if (
       selectedReportType === "maintenance" &&
       selectedEquipment &&
       selectedMaintenance
     ) {
-      window.location.href = `/reports/maintenance/${selectedEquipment}/${selectedMaintenance}`;
+      window.location.href = `/others/reports/maintenance/${selectedEquipment}/${selectedMaintenance}`;
     }
   };
 

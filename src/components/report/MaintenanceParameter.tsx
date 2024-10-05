@@ -15,7 +15,7 @@ interface Equipment {
   desc: string;
 }
 
-const FuelParameter: React.FC = () => {
+const MaintenanceParameter: React.FC = () => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState<number | null>(
     null
@@ -54,7 +54,7 @@ const FuelParameter: React.FC = () => {
     e.preventDefault();
     const fdateforApi = fdate.toISOString().slice(0, 10);
     const edateforApi = edate.toISOString().slice(0, 10);
-    window.location.href = `/others/reports/fuelcard/${selectedEquipment}/${fdateforApi}/${edateforApi}`;
+    window.location.href = `/others/reports/euiphistory/${selectedEquipment}/${fdateforApi}/${edateforApi}`;
   };
 
   return (
@@ -157,4 +157,4 @@ const FuelParameter: React.FC = () => {
   );
 };
 
-export default FuelParameter;
+export default MaintenanceParameter;

@@ -1,33 +1,16 @@
 import { auth } from "@/auth";
 
-import { workOrderlist, vendorList, equipmentType } from "@/lib/zod";
+import { workOrderlist,  equipmentType } from "@/lib/zod";
 
-import { Button } from "@/components/ui/button";
-import TaskList from "@/components/data/TaskList";
-import TaskAdd from "@/components/data/TaskAdd";
-import { ResponsiveDialog } from "@/components/dialogui/Dialogui";
+
 import WorkOrderList from "@/components/data/WorkOrderList";
 
-export default async function task() {
+export default async function workorders() {
   const session = await auth();
 
   if (!session) return <div>Not authenticated</div>;
 
-  const response = await fetch(`${process.env.API_PATH}workorders`, {
-    cache: "no-cache",
-  });
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-
-  const result = await response.json();
-
-  const workorders = workOrderlist.safeParse(result);
-  if (!workorders.success) {
-    console.log("Error parsing workorder:", workorders.error);
-    //throw new Error("invalid Notificaton type");
-  }
+ 
   const equipres = await fetch(`${process.env.API_PATH}equipments`, {
     cache: "no-cache",
   });
@@ -43,10 +26,32 @@ export default async function task() {
     console.log("Error parsing workorder:", equipdetails.error);
     //throw new Error("invalid Notificaton type");
   }
+  const workres = await fetch(`${process.env.API_PATH}workorderlist`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache"
+    },
+    cache: "no-cache"
+  });
+ 
+  if (!workres.ok) {
+    throw new Error("Network response was not ok");
+  }
 
+  const result = await workres.json();
+  
+  const workorders = await workOrderlist.safeParse(result);
+
+  if (!workorders.success) {
+    console.log("Error parsing workorder:", workorders.error);
+    //throw new Error("invalid Notificaton type");
+  }
+  
   return (
     <>
       <div>
+     
         <WorkOrderList
           key="workorderlist"
           data={workorders.data || []}

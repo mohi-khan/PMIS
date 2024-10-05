@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 
-import { tasklist, Tasks } from "@/lib/zod";
+import { masterlist, tasklist, Tasks } from "@/lib/zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,12 +17,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import TaskList from "@/components/data/TaskList";
 import TaskAdd from "@/components/data/TaskAdd";
-import { ResponsiveDialog } from "@/components/dialogui/Dialogui";
+
 
 export default async function task() {
   const session = await auth();
 
   if (!session) return <div>Not authenticated</div>;
+
 
   const response = await fetch(`${process.env.API_PATH}tasks`, {
     cache: "no-store",
@@ -33,11 +34,28 @@ export default async function task() {
   }
 
   const result = await response.json();
-  console.log(result);
+ 
 
   const tasks = tasklist.safeParse(result);
   if (!tasks.success) {
     console.log("Error parsing Tasks:", tasks.error);
+    //throw new Error("invalid Tasks type");
+  }
+
+  const equipResp = await fetch(`${process.env.API_PATH}equipmentlist`, {
+    cache: "no-store",
+  });
+
+  if (!equipResp.ok) {
+    throw new Error("Network response was not ok");
+  }
+
+  const equipres = await equipResp.json();
+
+
+  const equips = masterlist.safeParse(equipres);
+  if (!equips.success) {
+    console.log("Error parsing Equipments:", equips.error);
     //throw new Error("invalid Tasks type");
   }
 
@@ -73,7 +91,7 @@ export default async function task() {
       </div>
 
       <div>
-        <TaskList data={tasks.data || []} />
+        <TaskList data={tasks.data || []} equips={equips.data || []} />
       </div>
     </>
   );

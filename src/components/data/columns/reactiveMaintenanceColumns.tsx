@@ -1,6 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { ReactiveMaintenanceType } from "@/lib/zod";
 import SparePartShow from "./SparePartsShow";
+import { DropdownMenu,DropdownMenuLabel, DropdownMenuContent, DropdownMenuItem, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
+
 interface spareType {
   code: number;
   name: string;
@@ -9,10 +13,7 @@ interface spareType {
 
 export const reactiveMaintenanceColumns: ColumnDef<ReactiveMaintenanceType>[] =
   [
-    {
-      accessorKey: "datereported",
-      header: "Date Reported",
-    },
+  
     {
       accessorKey: "dateofmaintenance",
       header: "Date of Maintenance",
@@ -21,10 +22,7 @@ export const reactiveMaintenanceColumns: ColumnDef<ReactiveMaintenanceType>[] =
       accessorKey: "problemdescription",
       header: "Problem Description",
     },
-    {
-      accessorKey: "reportedby",
-      header: "Reported By",
-    },
+  
     {
       accessorKey: "asssigtechnician",
       header: "Assigned Technician",
@@ -47,7 +45,7 @@ export const reactiveMaintenanceColumns: ColumnDef<ReactiveMaintenanceType>[] =
     },
     {
       accessorKey: "laborhours",
-      header: "Labor Hours",
+      header: "Labor Cost",
     },
     {
       accessorKey: "costofparts",
@@ -57,18 +55,7 @@ export const reactiveMaintenanceColumns: ColumnDef<ReactiveMaintenanceType>[] =
       accessorKey: "completiondate",
       header: "Completion Date",
     },
-    {
-      accessorKey: "comments",
-      header: "Comments",
-    },
-    {
-      accessorKey: "preventivemeasures",
-      header: "Preventive Measures",
-    },
-    {
-      accessorKey: "vendorinformation",
-      header: "Vendor Information",
-    },
+   
     {
       accessorKey: "attachments",
       header: "Attachments",
@@ -91,6 +78,71 @@ export const reactiveMaintenanceColumns: ColumnDef<ReactiveMaintenanceType>[] =
                 ))
               : "No Attachments"}
           </div>
+        );
+      },
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+     
+  
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={async () => {
+                  const maintenance = row.original;
+  
+                  try {
+                    const isConfirmed = window.confirm(
+                      "Are you sure you want to cancel this Entry"
+                    );
+  
+                    if (!isConfirmed) return;
+                    const mydata = { maintenance: maintenance.maintenanceid };
+  
+                    const response = await fetch(
+                      `${process.env.NEXT_PUBLIC_API_PATH}cancel-maintainence`,
+                      {
+                        method: "POST", // Use DELETE or POST based on your API's requirement
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(mydata),
+                      }
+                    );
+  
+                    if (response.status === 200) {
+                      const data = await response.json();
+  
+                      alert(
+                        `Maintenance Entry Cancelled;  Maintenance Id: ${data.message}; Refresh the page`
+                      );
+                    } else {
+                      console.error("Failed to cancel the Maintenance");
+                    }
+                  } catch (error) {
+                    console.error("Error canceling the Task:", error);
+                  }
+                }}
+              >
+                Cancel
+              </DropdownMenuItem>
+             <DropdownMenuItem  onClick={ () => {
+               const maintenance = row.original;
+              window.location.href = `/reports/maintenance/${maintenance.equipment}/${maintenance.maintenanceid}`;}}>
+              Show Report
+             </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         );
       },
     },

@@ -16,6 +16,7 @@ interface EquipmentUpdateFormProps {
   equipmentDescription: string;
   username: string;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  updateEquipment: (id: number, additionalRunningHours: number, additionalMilageMeter: number) => void;
 }
 
 const MilageUpdateForm: React.FC<EquipmentUpdateFormProps> = ({
@@ -23,17 +24,17 @@ const MilageUpdateForm: React.FC<EquipmentUpdateFormProps> = ({
   equipmentDescription,
   username,
   setIsOpen,
+  updateEquipment
 }) => {
   const [date, setDate] = useState<Date>(new Date());
-  const [myDate, setMyDate] = useState("");
+  const [myDate, setMyDate] = useState(new Date().toISOString());
   const [milage, setMilage] = useState<number>(0.0);
-  const [runningHours, setRunningHours] = useState<number>(0);
+  const [runningHours, setRunningHours] = useState<number>(0.0);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [fuelConsumed, setFuelConsumed] = useState(0.0);
   const [fuelUnit, setFuelUnit] = useState("Litre");
   const handledatereported = (mydate: Date | undefined) => {
     if (mydate) {
-      console.log("ISO Date", mydate.toISOString());
       const timezoneOffset = mydate.getTimezoneOffset();
 
       // Subtract the offset to adjust to UTC
@@ -50,6 +51,11 @@ const MilageUpdateForm: React.FC<EquipmentUpdateFormProps> = ({
   const handleSubmit = async (event: React.FormEvent) => {
     const apipath = process.env.NEXT_PUBLIC_API_PATH;
     event.preventDefault();
+    if (!myDate) {
+      // Check if myDate is null or undefined
+
+      handledatereported(date);
+    }
     const mydata = {
       equipmentid: equipmentId,
       milagemeter: milage,
@@ -70,8 +76,16 @@ const MilageUpdateForm: React.FC<EquipmentUpdateFormProps> = ({
       });
 
       if (response.ok) {
-        alert("Record Updated Successfully!"), setIsOpen(false);
-      } else alert("Failed to Enter Data!!");
+        alert("Record Updated Successfully!"),
+        setIsOpen(false);
+        updateEquipment(equipmentId,runningHours,milage)
+      } else {
+        const errorData = await response.json(); // Parse the JSON error response
+        const errorMessage = errorData.message  || "Unknown error";
+        alert(
+          `Failed to Enter Data! Error: ${errorMessage}`
+        );
+      }
     } catch (e: any) {
       console.log(e);
     }
@@ -124,7 +138,7 @@ const MilageUpdateForm: React.FC<EquipmentUpdateFormProps> = ({
         <input
           type="number"
           value={milage}
-          onChange={(e) => setMilage(parseInt(e.target.value, 10))}
+          onChange={(e) => setMilage(parseFloat(e.target.value))}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
         />
       </div>

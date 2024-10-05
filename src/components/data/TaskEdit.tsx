@@ -1,12 +1,17 @@
 "use client";
 
+import { task } from "@/lib/zod";
 import React, { useState } from "react";
-
-export default function TaskAdd({ apipath }: { apipath: String }) {
-  const [taskname, setTaskName] = useState("");
-  const [frequency, setFrequency] = useState(0);
-  const [frequencyUnit, setFrequencyUnit] = useState("Kilo");
-  const [advnotice, setAdvNotice] = useState(0);
+interface TaskEditProps {
+  task: task;
+  setIsOpen: (isOpen: boolean) => void;
+  onTaskUpdated: (updatedTask: task) => void; // New prop to update task in the parent
+}
+const TaskEdit: React.FC<TaskEditProps> = ({ task, setIsOpen, onTaskUpdated }) =>{
+  const [taskname, setTaskName] = useState(task.taskname);
+  const [frequency, setFrequency] = useState(task.frequency);
+  const [frequencyUnit, setFrequencyUnit] = useState(task.frequencyunit);
+  const [advnotice, setAdvNotice] = useState(task.advancenotice);
   const [disable, setDisable] = useState(false);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -29,25 +34,32 @@ export default function TaskAdd({ apipath }: { apipath: String }) {
       alert("Advance Notice Required");
       return;
     }
+    const apipath = process.env.NEXT_PUBLIC_API_PATH;
     const mydata = {
+      taskid: task.taskid,
       taskname: taskname,
       frequency: frequency,
       frequencyunit: frequencyUnit,
-      advnotice: advnotice,
+      advancenotice: advnotice,
     };
     console.log(mydata);
     try {
-      const response = await fetch(`${apipath}tasks`, {
+      const response = await fetch(`${apipath}update-task`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer pmis",
+          Authorization: "Bearer pmis"
         },
         body: JSON.stringify(mydata),
       });
-
+      
       if (response.ok) {
-        alert("Record Updated Successfully!")
+        const result=await response.json();
+        const updateTask=result.updatedTask;
+        console.log(updateTask)
+        alert(`Record Updated Successfully! Task Id: ${updateTask.taskid}`);
+        onTaskUpdated(updateTask)
+        setIsOpen(false)
       } else alert("Failed to Enter Data!!");
 
       //  alert(result);
@@ -92,7 +104,7 @@ export default function TaskAdd({ apipath }: { apipath: String }) {
               onChange={(e) => setFrequencyUnit(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              {["Kilo", "Running Hours", "Days"].map((man, index) => (
+              {["Kilo", "Running Hours", "Days","Months"].map((man, index) => (
                 <option key={index} value={man}>
                   {man}
                 </option>
@@ -117,10 +129,11 @@ export default function TaskAdd({ apipath }: { apipath: String }) {
             className="w-full px-4 py-2 bg-blue-500 text-white rounded-md"
             disabled={disable}
           >
-            Add to Records
+            Update Tasks
           </button>
         </div>
       </form>
     </div>
   );
 }
+export default TaskEdit;

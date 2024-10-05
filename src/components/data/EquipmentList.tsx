@@ -50,6 +50,7 @@ const EquipmentList = ({
   const [isFuelOpen, setIsFuelOpen] = useState(false); //For Adding Fuel
   const [isReactiveOpen, setIsReactiveOpen] = useState(false); //For Adding Reactive Maint.
   const [isMilageOpen, setIsMilageOpen] = useState(false); //For Adding Milage
+  const [equipmentList,setEquipmentList]=useState(data);
   const [equipId, setEquipId] = useState(0);
   const [equipname, setEquipName] = useState("");
   const pageSize = 10;
@@ -58,7 +59,7 @@ const EquipmentList = ({
     setCurrentPage(page);
   };
   //const data:Item[] = await Items()
-  const sliceddata: equipmentlist[] = paginate(data, currentPage, pageSize);
+  const sliceddata: equipmentlist[] = paginate(equipmentList, currentPage, pageSize);
   function findOverDue(equipid: number) {
     const taskInfo = pendingtask.find((task) => task.equipmentid === equipid);
     return taskInfo ? taskInfo.overdue_count : "0";
@@ -67,6 +68,23 @@ const EquipmentList = ({
     const taskInfo = pendingtask.find((task) => task.equipmentid === equipid);
     return taskInfo ? taskInfo.advance_notice_count : "0";
   }
+  ////Update the milage and running hours based on equipment id; send a parameter to milage component as callback function
+  const updateEquipment = (id: number, additionalRunningHours: number, additionalMilageMeter: number) => {
+    setEquipmentList(prevList =>
+      prevList.map(equipment =>
+        equipment.id === id
+          ? {
+              ...equipment,
+              runninghour: equipment.runninghour + additionalRunningHours,
+              milagemeter: equipment.milagemeter
+                ? equipment.milagemeter + additionalMilageMeter
+                : additionalMilageMeter, // Handle nullable field
+            }
+          : equipment
+      )
+    );
+  };
+  
   return (
     /*********For Task entry */
     <>
@@ -121,6 +139,7 @@ const EquipmentList = ({
           equipmentDescription={equipname}
           setIsOpen={setIsMilageOpen}
           username={username}
+          updateEquipment={updateEquipment}
         />
       </ResponsiveDialog>
       <div className="table-auto w-full bg-white rounded-lg overflow-hidden shadow-md">
@@ -147,7 +166,7 @@ const EquipmentList = ({
               <tr key={index} className="bg-white text-gray-800">
                 <td className="py-2 px-4 hover:bg-gray-200 text-sm">
                   <Link
-                    href={`/equipments/${equipment.id}`}
+                    href={`/others/equipments/${equipment.id}`}
                   >{`${equipment.name}/${equipment.model}`}</Link>
                 </td>
                 <td className="py-2 px-4 hover:{bg-gray-200 text-sm}">

@@ -1,67 +1,47 @@
 "use client";
 
-import { TaskList } from "@/lib/zod";
+import { MasterType, task } from "@/lib/zod";
 import { useState } from "react";
-const EqupTask = ({
-  tasks,
-  equipid,
-  equipname,
+const TaskEquip = ({
+  equips,
+  currenttask,
   setIsOpen,
-  apipath,
 }: {
-  tasks: TaskList;
-  equipid: number;
-  equipname: string;
+  equips: MasterType;
+  currenttask: task;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  apipath: string;
 }) => {
-  const [selectTask, setSelectTask] = useState(tasks[0].taskid || 0);
+  const [equipId, setEquipId] = useState(0);
   const [status, setStatus] = useState("Active");
-  const [freqDay, setFreqDay] = useState(0);
-  const [days, setDays] = useState("Days");
-  const [advNotice, setAdvNotice] = useState(0);
-  const [performDate, setPerformDate] = useState(null||'');
+  const [freqDay, setFreqDay] = useState(
+    currenttask.frequencyunit === "Kilo" ?  0 :currenttask.frequency 
+  );
+  const [days, setDays] =  useState(
+    currenttask.frequencyunit === "Kilo" ?  "days" :currenttask.frequencyunit
+  );
+  const [advNotice, setAdvNotice] =  useState(
+    currenttask.frequencyunit === "Kilo" ?  0 :currenttask.advancenotice
+  );
+  const [performDate, setPerformDate] = useState(null || "");
   const [performH, setPerformH] = useState(0);
-  const [freqKm, setFreqKm] = useState(0);
-  const [advNoticek, setAdvNoticek] = useState(0);
+  const [freqKm, setFreqKm] = useState(
+    currenttask.frequencyunit === "Kilo" ? currenttask.frequency : 0
+  );
+  const [advNoticek, setAdvNoticek] = useState(
+    currenttask.frequencyunit === "Kilo" ? currenttask.advancenotice : 0
+  );
+
   const [lastPerformk, setlastPerformk] = useState(0);
   const [disable, setDisable] = useState(false);
-  const handleTaskChange = (taskId: string) => {
-    const selectedTask = tasks.find((task) => task.taskid === parseInt(taskId));
-    console.log(taskId);
-    console.log(tasks);
-    console.log(selectTask);
-    if (selectedTask) {
-      setSelectTask(selectedTask.taskid);
-  
-      // Adjust state based on task type (e.g., KM or Days)
-      if (selectedTask.frequencyunit === "Kilo") {
-        setFreqKm(selectedTask.frequency);
-        setAdvNoticek(selectedTask.advancenotice);
-        setFreqDay(0); // Disable day-related fields
-       setAdvNotice(0);
-      } else {
-        setFreqDay(selectedTask.frequency);
-        setAdvNotice(selectedTask.advancenotice);
-        setFreqKm(0); // Disable KM-related fields
-        setAdvNoticek(0);
-        setDays(selectedTask.frequencyunit)
-        if (selectedTask.frequencyunit==="Running Hours"){
-          setDays('Hours')}
-        
-      }
-    }
-  };
+  const apipath = process.env.NEXT_PUBLIC_API_PATH;
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    if (!equipid) {
+
+    if (!equipId) {
       alert("Equipment Id Required");
       return;
     }
-    if (!selectTask) {
-      alert("Task Name Required");
-      return;
-    }
+
     if (advNotice >= freqDay && freqDay > 0) {
       alert(`Advance Notice Should be less then Frequency Day`);
       return;
@@ -78,14 +58,13 @@ const EqupTask = ({
       alert("Advance Notice Should be more then Frequency Km");
       return;
     }
-    if (freqDay<=0 && freqKm <=0 )
-    {
+    if (freqDay <= 0 && freqKm <= 0) {
       alert("Either Day Tracking or Kilometer Needs to Be Positive Value");
       return;
     }
     const mydata = {
-      equipmentid: equipid,
-      taskid: selectTask,
+      equipmentid: equipId,
+      taskid: currenttask.taskid,
       frequencytime: freqDay,
       frequencytimeunit: days,
       advancenoticetime: advNotice,
@@ -118,22 +97,24 @@ const EqupTask = ({
   return (
     <>
       <div className="max-w-lg mx-auto p-4 bg-white rounded-lg shadow-md">
-        <h1 className="text-blue-600 text-lg font-extrabold">{equipname}</h1>
+        <h1 className="text-blue-600 text-lg font-extrabold">
+          {currenttask.taskname}
+        </h1>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-1">
             <div className="mb-2 flex space x-4">
               <label className="block text-sm font-medium text-gray-700">
-                Task Name
+                Equipment Name
               </label>
 
               <select
-                value={selectTask}
-                onChange={(e) => handleTaskChange(e.target.value)}
+                value={equipId}
+                onChange={(e) => setEquipId(parseInt(e.target.value))}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               >
-                {tasks.map((task, index) => (
-                  <option key={index} value={task.taskid}>
-                    {task.name}
+                {equips.map((equipemnt, index) => (
+                  <option key={index} value={equipemnt.id}>
+                    {equipemnt.desc}
                   </option>
                 ))}
               </select>
@@ -278,4 +259,4 @@ const EqupTask = ({
   );
 };
 
-export default EqupTask;
+export default TaskEquip;

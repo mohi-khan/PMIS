@@ -55,8 +55,12 @@ export default async function equipment() {
   });
   const taskresult: TaskList = await tasks.json();
   const tasklist = taskresult.map((item) => ({
-    id: item.id,
+    taskid: item.taskid,
     name: item.name,
+    frequency:item.frequency,
+    frequencyunit:item.frequencyunit,
+    advancenotice:item.advancenotice
+
   }));
   const venres = await fetch(`${process.env.API_PATH}vendors`, {
     cache: "no-store",

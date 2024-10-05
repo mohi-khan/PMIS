@@ -31,7 +31,6 @@ export default function WorkOrder({
   employee,
   setIsOpen,
   vendors,
-  apipath,
   username,
 }: {
   equipmentId: number;
@@ -41,8 +40,7 @@ export default function WorkOrder({
   employee: vendorList;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   vendors: vendorList;
-  apipath: String;
-  username: string;
+   username: string;
 }) {
   const [equipId, setEquipmentId] = useState(equipmentId);
   const [taskId, setTaskId] = useState(taskid);
@@ -55,8 +53,9 @@ export default function WorkOrder({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false); //For closing popover once data is selected
   const [isDPopoverOpen, setIsDPopoverOpen] = useState(false); //For closing popover once data is selected
   const [disable, setDisable] = useState(false);
+  const apipath=process.env.NEXT_PUBLIC_API_PATH;
   const handleValueChange = (value: string) => {
-    const selected = vendors.find((vendor) => vendor.name === value);
+  const selected = vendors.find((vendor) => vendor.name === value);
     if (selected) {
       setVendorId(selected.id);
     }
@@ -84,13 +83,20 @@ export default function WorkOrder({
     e.preventDefault();
 
     // Logic to add the equipment to records
-    if (!dueDate) setDueDate(new Date());
+    if (!dueDate) {
+      alert ("Due Date Required")
+      return;
+    }
     if (!equipId) {
       alert("Equipment Name Required");
       return;
     }
     if (!taskId) {
       alert("Task Required");
+      return;
+    }
+    if (!notes) {
+      alert("Notes Required");
       return;
     }
 

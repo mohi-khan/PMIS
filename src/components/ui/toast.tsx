@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 export default function Mytoast({ message }: { message: string }) {
   const handleButtonClick = () => {
-    toast.success(<Link href="/notificationlist">{message}</Link>); // Displays a success message
+    toast.success(<Link href="/others/notificationlist">{message}</Link>); // Displays a success message
   };
 
   return (

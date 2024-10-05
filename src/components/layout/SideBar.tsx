@@ -36,22 +36,22 @@ export default async function SideBar() {
         <ul className="flex flex-col pt-4">
           <li className="group">
             <p className="px-4 py-2 text-gray-300 hover:text-white font-medium rounded-t-md">
-              <Link href="/equipments">Equipments</Link>
+              <Link href="/others/equipments">Equipments</Link>
             </p>
             <p className="px-4 py-2 text-gray-300 hover:text-white font-medium rounded-t-md">
-              <Link href="/tasks">Tasks</Link>
+              <Link href="/others/tasks">Tasks</Link>
             </p>
             <p className="px-4 py-2 text-gray-300 hover:text-white font-medium rounded-t-md">
-              <Link href="/workorder"> Work Orders</Link>
+              <Link href="/others//workorder"> Work Orders</Link>
             </p>
             <p className="px-4 py-2 text-gray-300 hover:text-white font-medium rounded-t-md">
-              <Link href="/spareparts">Spare </Link>
+              <Link href="/others/spareparts">Spare </Link>
             </p>
             <p className="px-4 py-2 text-gray-300 hover:text-white font-medium rounded-t-md">
               Vendors
             </p>
             <p className="px-4 py-2 text-gray-300 hover:text-white font-medium rounded-t-md">
-              <Link href="/reports/parameters">Reports</Link>
+              <Link href="/others/reports/parameters">Reports</Link>
             </p>
           </li>
         </ul>

@@ -109,8 +109,8 @@ export default async function App({ params }: EquipmentParams) {
     const maintainencedata =
       maintenancehistorydata.safeParse(maintainecehistory);
     if (!maintainencedata.success) {
-      console.log("Error parsing workorder:", maintainencedata.error);
-      throw new Error("invalid workorder Data");
+      console.log("Error parsing Maintainance:", maintainencedata.error);
+      throw new Error("invalid Maintainance Data");
     }
     return maintainencedata.data;
   }
@@ -203,6 +203,12 @@ export default async function App({ params }: EquipmentParams) {
   const empres = await fetch(`${process.env.API_PATH}employees`, {
     cache: "no-store",
   });
+  const empresult: vendorList = await empres.json();
+
+  const employees = empresult.map((item) => ({
+    id: item.id,
+    name: item.name,
+  }));
 
   //////// For Task Data
 
@@ -217,7 +223,7 @@ export default async function App({ params }: EquipmentParams) {
   const equiptask = taskschlist.safeParse(taskresult.rows);
 
   if (!equiptask.success) {
-    console.log("Error parsing Equipment:", equiptask.error);
+    console.log("Error parsing Equipment Tasks:", equiptask.error);
     throw new Error("invalid equipment type");
   }
   ////For Spare Data
@@ -244,7 +250,7 @@ export default async function App({ params }: EquipmentParams) {
         <tbody>
           <tr>
             <td className="flex items-center">
-              <Link href="/equipments">
+              <Link href="/others/equipments">
                 <FaArrowLeft className="text-xl mr-2 cursor-pointer" />
               </Link>
               <h1 className="text-xl text-black">{`${equipmentdata.data.name}/${equipmentdata.data.model}`}</h1>
@@ -288,7 +294,7 @@ export default async function App({ params }: EquipmentParams) {
           </div>
         </TabsContent>
         <TabsContent value="tasks">
-          <EquipTaskList data={equiptask.data} />
+          <EquipTaskList equipid={equipmentdata.data.id} data={equiptask.data} vendors={vendors}  username={session.user?.email || ""} employee={employees} equipdesc={`${equipmentdata.data.name}/${equipmentdata.data.model}`}/>
         </TabsContent>
         <TabsContent value="parts">
           <EqupSpare spares={equpspare.data} />

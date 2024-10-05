@@ -47,7 +47,6 @@ const NotificationList = ({
           vendors={vendors}
           employee={employee}
           setIsOpen={setIsOpen}
-          apipath={apipath}
           username={username}
         />
       </ResponsiveDialog>

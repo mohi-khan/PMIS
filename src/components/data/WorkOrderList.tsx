@@ -27,13 +27,43 @@ export default function WorkOrderList({
   data: WorkOrderType;
   equipdata: equipmentlist[];
   username: string;
-}) {
+}) 
+{
   const [isOpen, setIsOpen] = useState(false);
   const [equipId, setEquipId] = useState(0);
   const [workorderId, setWorkorderId] = useState(0);
   const [equipDetails, setEquipDetails] = useState("");
-  console.log(equipdata);
-  return (
+  const [workorders, setWorkorders] = useState(data); 
+  const cancelworkorder=async(id:number)=>{
+    try {
+      const isConfirmed = window.confirm("Are you sure you want to cancel this workorder?");
+      if (isConfirmed) {
+      const mydata={workorderid:id};
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_PATH}cancel-workorder`, {
+        method: "POST", // Use DELETE or POST based on your API's requirement
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(mydata)
+
+      });
+      
+      if (response.ok) {
+        // Task canceled, refresh the task list by removing the canceled task from the state
+        const updatedWorkorder = workorders.filter(workorder => workorder.id !== id);
+        setWorkorders(updatedWorkorder);
+      } else {
+        console.error("Failed to cancel the workorder");
+      }}
+    } catch (error) {
+      console.error("Error canceling the workorder:", error);
+    }}
+    const handleRefresh = (id:number) => {
+      const updatedWorkorder = workorders.filter(workorder => workorder.id !== id);
+      setWorkorders(updatedWorkorder);
+    };
+    return (
     <>
       <ResponsiveDialog
         isOpen={isOpen}
@@ -41,6 +71,7 @@ export default function WorkOrderList({
         title={`Close WorkOrder: ${equipDetails}`}
       >
         <WorkOrderComplete
+          onSubmit={handleRefresh}
           workorderid={workorderId}
           equipmentid={equipId}
           equipmentdata={equipdata}
@@ -78,7 +109,7 @@ export default function WorkOrderList({
             </tr>
           </thead>
           <tbody>
-            {data.map((workorder, index) => (
+            {workorders.map((workorder, index) => (
               <>
                 <tr key={index} className="bg-white text-gray-800">
                   <td className="py-2 px-4 hover:bg-gray-200 text-sm">
@@ -122,7 +153,7 @@ export default function WorkOrderList({
                           <DropdownMenuLabel>
                             <button
                               onClick={() => {
-                                // setIsOpen(true);
+                               cancelworkorder(workorder.id)
                               }}
                               className="w-full justify-start flex rounded-md p-2 transition-all duration-75 hover:bg-neutral-100"
                             >

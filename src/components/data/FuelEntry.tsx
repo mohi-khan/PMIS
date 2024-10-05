@@ -36,7 +36,8 @@ const FuelEntry = ({
   username: string;
 }) => {
   const [fuelDate, setFuelDate] = useState<Date>();
-  const [fuel, setFuel] = useState(0);
+  const [fuel, setFuel] = useState(0.0);
+  const [price, setPrice] = useState(0.0);
   const [asignee, setAsignee] = useState(employee[0].id);
   const [priorMiles, setPriorMiles] = useState(0);
   const [currentMiles, setCurrentMiles] = useState(0);
@@ -48,9 +49,12 @@ const FuelEntry = ({
       alert("Fuel Date Required");
       return;
     }
-    if (currentMiles == 0 && runningHours == 0) {
-      alert("Current Milage or Running Hours Required");
+    if (priorMiles == 0 && runningHours == 0) {
+      alert("KM Run or Running Hours Required");
       return;
+    }
+    if (fuel==0){
+      alert("Fuel Needs to be entered")
     }
     const mydata = {
       equipmentid: equipid,
@@ -60,6 +64,7 @@ const FuelEntry = ({
       currentmilage: currentMiles,
       operatorname: asignee,
       runninghour: runningHours,
+      price:price,
       username: username,
     };
     console.log(mydata);
@@ -76,7 +81,9 @@ const FuelEntry = ({
       if (response.ok) {
         alert("Record Updated Successfully!"), setIsOpen(false);
       } else {
-        alert("Failed to Enter Data!!");
+        const errorData = await response.json(); // Parse the JSON error response
+        const errorMessage = errorData.message  || "Unknown error";
+        alert(`Error Inserting Date:${errorMessage}`);
       }
       //  alert(result);
     } catch (e: any) {
@@ -96,11 +103,13 @@ const FuelEntry = ({
   };
   return (
     <>
-      <div className="max-w-lg mx-auto p-4 bg-white rounded-lg shadow-md">
-        <h1 className="text-blue-600 text-lg font-extrabold">{equipname}</h1>
+      <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+        <h1 className="text-blue-600 text-xl font-extrabold mb-6 text-center">
+          {equipname}
+        </h1>
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 sm:grid-cols-1">
-            <div className="mb-2 flex space x-4">
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex flex-col space-y-1">
               <label className="block text-sm font-medium text-gray-700">
                 Fueled On
               </label>
@@ -109,10 +118,10 @@ const FuelEntry = ({
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-[280px] justify-start text-left font-normal",
+                      "w-full justify-start text-left font-normal",
                       !fuelDate && "text-muted-foreground"
                     )}
-                    onClick={() => setIsPopoverOpen(true)} // Show the Popover when the button is clicked
+                    onClick={() => setIsPopoverOpen(true)}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {fuelDate ? (
@@ -132,23 +141,32 @@ const FuelEntry = ({
                 </PopoverContent>
               </Popover>
             </div>
-            <div className="mb-2 flex space x-4">
-              <label className="block text-sm font-medium text-gray-700 ">
-                Fuel:
+
+            <div className="flex flex-col space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Fuel (Liters)
               </label>
               <input
                 type="text"
                 value={fuel}
-                onChange={(e) => setFuel(parseInt(e.target.value))}
+                onChange={(e) => setFuel(parseFloat(e.target.value))}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
-              <label className="block text-sm font-medium text-gray-700">
-                Ltrs
-              </label>
             </div>
-            <div className="mb-2 flex space x-4">
-              <label className="block text-sm font-medium text-gray-700 ">
-                Prior Miles:
+            <div className="flex flex-col space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Price
+              </label>
+              <input
+                type="text"
+                value={price}
+                onChange={(e) => setPrice(parseFloat(e.target.value))}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div className="flex flex-col space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Km (Run)
               </label>
               <input
                 type="text"
@@ -157,9 +175,10 @@ const FuelEntry = ({
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
-            <div className="mb-2 flex space x-4">
-              <label className="block text-sm font-medium text-gray-700 ">
-                Current Miles:
+
+            <div className="flex flex-col space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Current Miles
               </label>
               <input
                 type="text"
@@ -168,20 +187,10 @@ const FuelEntry = ({
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
-            <div className="mb-2 flex space x-4">
-              <label className="block text-sm font-medium text-gray-700 ">
-                Current Miles:
-              </label>
-              <input
-                type="text"
-                value={currentMiles}
-                onChange={(e) => setCurrentMiles(parseInt(e.target.value))}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-            <div className="mb-2 flex space x-4">
-              <label className="block text-sm font-medium text-gray-700 ">
-                Running Hours:
+
+            <div className="flex flex-col space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Running Hours
               </label>
               <input
                 type="text"
@@ -190,14 +199,14 @@ const FuelEntry = ({
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
-            <div className="mb-4">
+
+            <div className="flex flex-col space-y-1">
               <label className="block text-sm font-medium text-gray-700">
                 Operator
               </label>
-
               <Select onValueChange={empValueChange}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select asignee " />
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Assignee" />
                 </SelectTrigger>
                 <SelectContent className="text-gray-800">
                   <SelectGroup>
@@ -211,10 +220,11 @@ const FuelEntry = ({
                 </SelectContent>
               </Select>
             </div>
+
             <div className="mt-6">
               <button
                 type="submit"
-                className="w-full px-4 py-2 bg-blue-500 text-white rounded-md"
+                className="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                 disabled={disable}
               >
                 Add to Records

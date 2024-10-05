@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { equipmentlist, vendorList } from "@/lib/zod";
 import SpareSelector from "../tools/SpareSelector";
 import AttachmentViewer from "../tools/AttachmentViewer";
+import { start } from "repl";
 interface spareType {
   code: number;
   name: string;
@@ -19,19 +20,24 @@ interface spareList {
   code: number;
   name: string;
 }
-export default function WorkOrderComplete({
-  workorderid,
-  equipmentid,
-  equipmentdata,
-  username,
-  setIsOpen,
-}: {
+interface ChildComponentProps {
+  onSubmit: (id:number) => void;
   workorderid: number;
   equipmentid: number;
   equipmentdata: equipmentlist[];
   username: string;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+}
+export default function WorkOrderComplete({
+  onSubmit,
+  workorderid,
+  equipmentid,
+  equipmentdata,
+  username,
+  setIsOpen,
+}: 
+  ChildComponentProps
+) {
   interface spareType {
     code: number;
     name: string;
@@ -88,8 +94,28 @@ export default function WorkOrderComplete({
   const handleSpareListChange = (updatedSpareList: spareType[]) => {
     setUsedSpare(updatedSpareList);
   };
-
+  //To adjust UTC Time to GMT
+  function addHours(date: Date, hours: number): Date {
+    const newDate = new Date(date.getTime() + hours * 60 * 60 * 1000);
+    return newDate;
+  }
   const handleSubmit = async (e: any) => {
+    if (!startDate || !endDate) {
+     alert('Both Start Time and End Time are required.');
+      return;
+    }
+    if (notes===""){
+      alert("Notes Cannot be Empty")
+      return;
+    }
+    if (observation===""){
+      alert("Observation Cannot be Empty")
+      return;
+    }
+    if (procedure===""){
+      alert("Procedure Cannot be Empty")
+      return;
+    }
     let data = {};
 
     const formData = new FormData();
@@ -117,10 +143,10 @@ export default function WorkOrderComplete({
       workorderid: workorderid,
       status: "completed", // You can set this based on your logic
       workstarttime: startDate
-        ? startDate.toISOString().split("T")[0]
+        ? new Date(addHours(startDate,6)).toISOString()
         : undefined,
       workcompletiontime: endDate
-        ? endDate.toISOString().split("T")[0]
+        ? new Date(addHours(endDate,6)).toISOString()
         : undefined,
       spare: usedSpare,
       complitionnotes: notes,
@@ -147,6 +173,7 @@ export default function WorkOrderComplete({
     } catch (e: any) {
       console.log(e);
     }
+    onSubmit(workorderid)
   };
   return (
     <>

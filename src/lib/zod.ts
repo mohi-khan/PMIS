@@ -12,19 +12,19 @@ const equipmentListSchema = z.object({
   name: z.string(),
   model:z.string(),
   runninghour: z.number(),
-  milagemeter: z.string().nullable(),
+  milagemeter: z.number().nullable(),
 });
 export const equipmentSchema = z.object({
   id: z.number().int(),
   name: z.string(),
   model:z.string(),
-  status:z.string(),
+  status:z.string().nullable(),
   manufacturur:z.string().nullable(),
   serial:z.string(),
   location:z.string().nullable(),
   purchasedate:z.string().nullable(),
   runninghour: z.number(),
-  milagemeter: z.string().nullable(),
+  milagemeter: z.number().nullable(),
   vendor:z.number().nullable(),
 });
 export const woSchema = z.object({
@@ -52,15 +52,18 @@ const vendorslistSchema=z.object({
   name: z.string()
 })
 const tasklistSchema=z.object({
-  id: z.number().int(),
-  name: z.string()
-})
-const taskSchema = z.object({
-  id: z.number().int(),
+  taskid: z.number().int(),
   name: z.string(),
   frequency:z.number().int(),
-  frequnit: z.string(),
-  advnotice: z.number().int(),
+  frequencyunit: z.string(),
+  advancenotice: z.number().int(),
+})
+const taskSchema = z.object({
+  taskid: z.number().int(),
+  taskname: z.string(),
+  frequency:z.number().int(),
+  frequencyunit: z.string(),
+  advancenotice: z.number().int(),
 });
 const taskschSchema = z.object({
   schid:z.number(),
@@ -97,9 +100,9 @@ const workOrderSchema = z.object({
   equipmentname: z.string(),
   equipmentmodel: z.string(),
   task: z.string(),
-  assignee: z.string(),
-  vendors: z.string(),
-  scheduledate: z.string(),
+  assignee: z.string().nullable(),
+  vendors: z.string().nullable(),
+  scheduledate: z.string().nullable(),
   duedate: z.string(),
   notes: z.string(),
   priority: z.string()
@@ -107,7 +110,7 @@ const workOrderSchema = z.object({
 const completeWorkOrderSchema = z.object({
   workorderid: z.number(),
   taskname: z.string(),
-  scheduledate: z.string().optional(), // assuming date as string; you can use z.date() if it's a Date object
+  scheduledate: z.string().nullable(), // assuming date as string; you can use z.date() if it's a Date object
   assigneename: z.string(),
   vendorname: z.string().nullable(),
   notes: z.string().optional(),
@@ -159,26 +162,44 @@ const equipSpareSchema=z.object(
 )
 const fuelSchema=z.object(
   {
+    fuelentryid:z.number(),
     fueldate:z.string(),
     fuelqty:z.number(),
     fuelunit:z.string().nullable().default('Litres'),
     lastmilage:z.number(),
     currentmilage:z.number(),
     runninghour:z.number(),
+    price:z.number(),
     vendorname:z.string().nullable(),      
   }
 
 )
+const fuelhistoryschema=z.object(
+  {
+    equipmentid: z.number(),
+    equipmentname: z.string(),
+    model: z.string(),
+    milagemeter: z.number(),
+    runninghours: z.number(),
+    fuelconsumed: z.number(),
+    date: z.string(),
+    mileage_per_liter: z.number().nullable(),
+    running_hours_per_liter: z.number().nullable()  
+  }
+
+)
+
 const expenseSchema=z.object({
   description:z.string(),
   equipmentdesc:z.string(),
   workorderid:z.number().optional().nullable(),
   reactivemaintenanceid:z.number().optional().nullable(),
-  trandate:z.string(),
+  trandate:z.string().nullable(),
   totalcost:z.number(),
   comments:z.string().optional().nullable()
 })
 const milageSchema=z.object({
+  meterupdateid:z.number(),
   equipmentname:z.string(),
   model:z.string(),
   milage:z.number(),
@@ -188,11 +209,12 @@ const milageSchema=z.object({
   fuelunit:z.string()
 })
 const reactiveMaintenanceSchema = z.object({
+  maintenanceid:z.number(),
   datereported: z.string(),
   dateofmaintenance: z.string(),
   problemdescription: z.string(),
-  reportedby: z.string(),
-  asssigtechnician: z.number(),
+  reportedby: z.string().nullable(),
+  asssigtechnician: z.string(),
   maintenancetype: z.string(),
   workperformed: z.string(),
   partused: z.array(z.object({
@@ -200,28 +222,31 @@ const reactiveMaintenanceSchema = z.object({
     name:z.string().optional(),
     qty: z.number().optional(),
   })).optional(),
-  laborhours: z.string(),
-  costofparts: z.string(),
+  laborhours: z.number(),
+  costofparts: z.number(),
   completiondate: z.string(),
   comments: z.string().optional(),
   preventivemeasures: z.string().optional(),
   vendorinformation: z.string().optional(),
   attachments: z.array(z.string()).optional(),
+  equipment:z.number()
 });
 
 // Type definition for the schema
 export type ReactiveMaintenanceType = z.infer<typeof reactiveMaintenanceSchema>;
 export const maintenancehistorydata=z.array(reactiveMaintenanceSchema)
 export const tasklist=z.array(taskSchema)
+export type task=z.infer<typeof taskSchema>
 export const taskschlist=z.array(taskschSchema)
 export type Tasks=z.infer<typeof tasklist>
 export type TaskschType=z.infer<typeof taskschlist>
 export const equipmentType=z.array(equipmentListSchema);
 export type equipmentlist=z.infer<typeof equipmentListSchema>
 export type equipments=z.infer<typeof equipmentSchema>
+export const equipmentlists = z.array(equipmentSchema)
 export const vendorListType=z.array(vendorslistSchema);
 export type vendorList=z.infer<typeof vendorListType>
-
+export const wolists = z.array(woSchema)
 export const taskListType=z.array(tasklistSchema);
 export type TaskList=z.infer<typeof taskListType>;
 export const overdue=z.array(overdueSchema)
@@ -239,6 +264,7 @@ export type EquipspareType=z.infer<typeof equipspare>
 const workorderArraySchema = z.array(workorderCompletionSchema);
 type WorkorderArray = z.infer<typeof workorderArraySchema>;
 export type FueldataType=z.infer<typeof fuelSchema>;
+export const fuelhistory=z.array(fuelhistoryschema)
 export type ExpensedataType=z.infer<typeof expenseSchema>;
 export type MilagedataType=z.infer<typeof milageSchema>;
 export const fuelhistorydata=z.array(fuelSchema);

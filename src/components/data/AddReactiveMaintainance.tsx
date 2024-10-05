@@ -36,14 +36,15 @@ interface MaintenanceFormData {
   datereported: Date;
   dateofmaintenance: Date;
   problemdescription: string;
-  reportedby: string;
-  assignedtechnician: string;
+  reportedby: string|null;
+  assignedtechnician: string|null;
   prioritylevel: string;
   maintenancetype: string;
   workperformed: string;
   partsused: spareType[];
   laborhours: number;
   costofparts: number;
+  totalcost:number;
   status: string;
   completiondate: Date;
   comments: string;
@@ -70,14 +71,15 @@ const AddReactiveMaintenance = ({
     datereported: new Date(),
     dateofmaintenance: new Date(),
     problemdescription: "",
-    reportedby: "",
-    assignedtechnician: "",
+    reportedby: null,
+    assignedtechnician: null,
     prioritylevel: "Low",
     maintenancetype: "Repair",
     workperformed: "",
     partsused: [],
     laborhours: 0,
     costofparts: 0,
+    totalcost:0,
     status: "Pending",
     completiondate: new Date(),
     comments: "",
@@ -177,6 +179,10 @@ const AddReactiveMaintenance = ({
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (formData.assignedtechnician === null){
+      alert('Please select Assigned Technican');
+      return;
+    }
     let data = [];
     const updatedfiles = new FormData();
     for (const file of files) {
@@ -213,7 +219,7 @@ const AddReactiveMaintenance = ({
       partsused: formData.partsused,
       laborhours: formData.laborhours,
       costofparts: formData.costofparts,
-      status: "Pending",
+      status: formData.status,
       completiondate: formData.completiondate,
       comments: formData.comments,
       attachments: data,
@@ -221,6 +227,7 @@ const AddReactiveMaintenance = ({
       vendorinformation: formData.vendorinformation,
       username: username,
     };
+    //alert(formData.totalcost)
     try {
       const response = await fetch(`${apipath}reactivemaintenance`, {
         method: "POST",
@@ -232,7 +239,13 @@ const AddReactiveMaintenance = ({
       });
       if (response.ok) {
         alert("Record Updated Successfully!"), setIsOpen(false);
-      } else alert("Failed to Enter Data!!");
+      } 
+      else{
+      const errorData = await response.json(); // Parse the JSON error response
+      const errorMessage = errorData.message  || "Unknown error";
+      alert(
+        `Failed to Enter Data! Error: ${errorMessage}`
+      );}
     } catch (e: any) {
       console.log(e);
     }
@@ -241,14 +254,15 @@ const AddReactiveMaintenance = ({
       datereported: new Date(),
       dateofmaintenance: new Date(),
       problemdescription: "",
-      reportedby: "",
-      assignedtechnician: "",
+      reportedby: null,
+      assignedtechnician: null,
       prioritylevel: "Low",
       maintenancetype: "Repair",
       workperformed: "",
       partsused: [],
       laborhours: 0,
       costofparts: 0,
+      totalcost:0,
       status: "Pending",
       completiondate: new Date(),
       comments: "",
