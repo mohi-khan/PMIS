@@ -20,8 +20,7 @@ export default function RootLayout({
 }>) {
   
   return (
-    <html lang="en">
-      <body>
+   <div>
         <Toaster position="top-right" />
         <div className="flex flex-col h-screen">
           <div className="h-12 bg-gray-800 text-white">
@@ -37,7 +36,6 @@ export default function RootLayout({
             </div>
           </div>
         </div>
-      </body>
-    </html>
+        </div>
   );
 }
