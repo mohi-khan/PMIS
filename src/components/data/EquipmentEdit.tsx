@@ -67,13 +67,13 @@ export default function EquipmentEdit({
     }
     const updatedData = {
       equipid: equipmentData.id,
-      equipname: equipname,
-      manufactur: manufacturer,
+      equipmentname: equipname,
+      manufacturer: manufacturer,
       model: model,
-      slno: serialNo,
+      serialnumber: serialNo,
       vendorid: vendorName,
-      purdate: purchaseDate,
-      runninghour: runningHours,
+      purchasedate: purchaseDate,
+      runninghours: runningHours,
       milagemeter: meter,
       username: username,
     };
@@ -87,8 +87,11 @@ export default function EquipmentEdit({
         },
         body: JSON.stringify(updatedData),
       });
+      console.log(response.body)
       if (response.ok) {
-        alert("Record Updated Successfully!"), setIsOpen(false);
+        alert("Record Updated Successfully!"), 
+        setIsOpen(false);
+        window.location.reload();
       } else alert("Failed to Update Data!!");
     } catch (e: any) {
       console.log(e);
